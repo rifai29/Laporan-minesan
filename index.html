@@ -3,48 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan Kasir v1.0.4</title>
+    <title>Sistem Laporan Kasir</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --alfamidi-red: #e1211a; --alfamidi-yellow: #ffcf00; --off-white: #f8f8f8; --text-main: #1e293b; --text-muted: #64748b; }
+        :root { --brand-red: #c1121c; --off-white: #f8fafc; --text-main: #1e293b; --text-muted: #94a3b8; --border-light: #f1f5f9; }
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--off-white); color: var(--text-main); }
 
-        /* Layout Dasar */
-        .navbar { background-color: var(--alfamidi-red); color: white; padding: 15px 20px; display: flex; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-right: 20px; }
-        .nav-title { font-weight: 700; font-size: 1.1rem; }
-
-        /* Sidebar */
-        .sidebar { position: fixed; left: -280px; top: 0; height: 100%; width: 280px; background: white; transition: 0.3s ease; z-index: 1100; padding: 30px 20px; border-right: 4px solid var(--alfamidi-yellow); }
+        /* Navbar & Sidebar */
+        .navbar { background-color: #ffffff; padding: 18px 20px; display: flex; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-light); }
+        .menu-btn { background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 15px; color: var(--brand-red); }
+        .nav-title { font-weight: 700; font-size: 0.95rem; text-transform: uppercase; }
+        .sidebar { position: fixed; left: -280px; top: 0; height: 100%; width: 280px; background: white; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1100; padding: 40px 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
         .sidebar.active { left: 0; }
-        .sidebar-link { display: block; padding: 15px 0; color: var(--text-main); text-decoration: none; font-weight: 600; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1050; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: none; z-index: 1050; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
-        /* Content */
+        /* List Nav */
+        .nav-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; border-bottom: 1px solid var(--border-light); cursor: pointer; }
+        .chevron { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* Cards & Content */
         .container { padding: 20px; max-width: 480px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-top: 3px solid var(--alfamidi-yellow); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card { background: #ffffff; border-radius: 16px; padding: 24px; margin-bottom: 20px; border-top: 4px solid var(--brand-red); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .scroll-container { max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; }
+
+        /* Form & Buttons */
+        label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        input { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; outline: none; background: #fcfcfc; font-size: 1rem; }
+        .btn-primary { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--brand-red); color: white; font-weight: 700; cursor: pointer; }
+        .hidden-input { display: none; }
+
+        /* Pop-up Modal */
+        .modal-container { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
+        .modal-container.active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; color: var(--text-main); }
+        .modal-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+
         .page { display: none; }
         .active-page { display: block; }
-
-        /* Form */
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 15px; outline: none; }
-        .helper-text { font-size: 0.9rem; font-weight: 700; color: #059669; margin-bottom: 15px; }
-
-        /* Buttons */
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; display: block; text-align: center; text-decoration: none; }
-        .btn-red { background: var(--alfamidi-red); color: white; }
-        .btn-outline { background: white; border: 2px solid var(--alfamidi-red); color: var(--alfamidi-red); }
-        .btn-green { background: #1d6f42; color: white; }
-
-        /* Table Bulanan */
-        .month-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .month-box { background: white; padding: 15px; border-radius: 10px; text-align: center; border-bottom: 3px solid var(--alfamidi-yellow); }
     </style>
 </head>
 <body>
+
+    <div class="modal-container" id="modal">
+        <div class="modal-content">
+            <div id="modal-title" class="modal-title">Konfirmasi</div>
+            <div id="modal-desc" class="modal-desc">Tindakan berhasil dilakukan.</div>
+            <button class="btn-primary" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
 
     <nav class="navbar">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
@@ -52,11 +63,11 @@
     </nav>
 
     <div class="sidebar" id="sidebar">
-        <h2>Navigasi</h2>
-        <div class="sidebar-link" onclick="showPage('harian', 'INPUT DATA')">Beranda</div>
-        <div class="sidebar-link" onclick="showPage('bulanan', 'LAPORAN BULANAN')">Laporan Bulanan</div>
-        <div class="sidebar-link" onclick="showPage('ekspor', 'EKSPOR & BACKUP')">Ekspor ke Excel</div>
-        <div class="sidebar-link" onclick="resetData()" style="color: var(--alfamidi-red); margin-top: 40px;">Reset Data</div>
+        <h2 style="font-size: 1.1rem; margin-bottom: 20px;">Menu Navigasi</h2>
+        <div class="nav-item" onclick="showPage('harian', 'INPUT DATA')">Beranda <span class="chevron">❯</span></div>
+        <div class="nav-item" onclick="showPage('bulanan', 'LAPORAN BULANAN')">Laporan Bulanan <span class="chevron">❯</span></div>
+        <div class="nav-item" onclick="showPage('ekspor', 'KELOLA DATA')">Ekspor & Impor <span class="chevron">❯</span></div>
+        <div class="nav-item" onclick="confirmReset()" style="color: var(--brand-red); margin-top: 40px; border-top: 1px solid #eee;">Hapus Semua Data <span class="chevron">❯</span></div>
     </div>
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
@@ -64,34 +75,46 @@
         
         <div id="page-harian" class="page active-page">
             <div class="card">
-                <label>Tanggal</label>
+                <label>Pilih Tanggal</label>
                 <input type="date" id="tgl">
-                <label>Jumlah Minus</label>
-                <input type="number" id="minus" placeholder="0" oninput="updateHelper()">
-                <div id="helper" class="helper-text">Terbaca: Rp 0</div>
-                <button class="btn btn-red" onclick="simpan()">SIMPAN DATA</button>
+                <label>Nominal Minus (Rp)</label>
+                <input type="number" id="minus" placeholder="Masukkan angka..." oninput="updateHelper()">
+                <div id="helper" style="font-weight:600; color:#059669; font-size:0.85rem; margin-top:-12px; margin-bottom:20px;">Rp 0</div>
+                <button class="btn-primary" onclick="simpan()">SIMPAN DATA</button>
             </div>
-            <div style="text-align:center; font-size: 11px; color:#999">Versi Sistem v1.0.4</div>
+            <div class="card">
+                <label>Catatan Terbaru (Scroll)</label>
+                <div class="scroll-container" id="recent-list"></div>
+            </div>
         </div>
 
         <div id="page-bulanan" class="page">
-            <div class="month-grid" id="grid-bulanan"></div>
+            <div class="card" id="rekap-container"></div>
         </div>
 
         <div id="page-ekspor" class="page">
             <div class="card">
-                <h3>Ekspor Spreadsheet</h3>
-                <p style="font-size: 12px; color:#666; margin-bottom: 15px;">Pilih metode jika download file eror di HP Anda.</p>
-                
-                <button class="btn btn-green" onclick="exportCSV()">📥 Download File .CSV</button>
-                <button class="btn btn-outline" onclick="salinFormatExcel()">📋 Salin Teks (Untuk Paste ke Excel)</button>
+                <label>Penyimpanan Cloud/Lokal</label>
+                <div class="nav-item" onclick="exportCSV()">
+                    <span>Download File (.csv)</span>
+                    <span class="chevron">📥</span>
+                </div>
+                <div class="nav-item" onclick="salinFormatExcel()">
+                    <span>Salin Teks ke Clipboard</span>
+                    <span class="chevron">📋</span>
+                </div>
+                <div class="nav-item" onclick="triggerImport()">
+                    <span>Impor dari File (.csv)</span>
+                    <span class="chevron">📂</span>
+                </div>
+                <input type="file" id="file-input" class="hidden-input" accept=".csv" onchange="importCSV(event)">
             </div>
         </div>
 
     </div>
 
     <script>
-        const DB_KEY = 'kasir_alfamidi_final';
+        const DB_KEY = 'kasir_v2_final';
         document.getElementById('tgl').valueAsDate = new Date();
 
         function toggleMenu() {
@@ -99,23 +122,32 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        function showModal(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
         function showPage(id, title) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
             document.getElementById('page-' + id).classList.add('active-page');
             document.getElementById('header-title').innerText = title;
+            if(id === 'harian') renderHistory();
             if(id === 'bulanan') renderBulanan();
             toggleMenu();
         }
 
         function updateHelper() {
             const val = document.getElementById('minus').value;
-            document.getElementById('helper').innerText = "Terbaca: Rp " + (parseInt(val) || 0).toLocaleString('id-ID');
+            document.getElementById('helper').innerText = "Rp " + (parseInt(val) || 0).toLocaleString('id-ID');
         }
 
         function simpan() {
             const tgl = document.getElementById('tgl').value;
             const amt = document.getElementById('minus').value;
-            if(!amt) return alert("Isi angka dulu");
+            if(!amt) return showModal("Input Kosong", "Silakan masukkan nominal minus terlebih dahulu.");
 
             const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
             data.unshift({ tgl, amt: parseInt(amt) });
@@ -123,57 +155,91 @@
             
             document.getElementById('minus').value = "";
             updateHelper();
-            alert("Berhasil Disimpan!");
+            renderHistory();
+            showModal("Berhasil", "Data harian telah berhasil disimpan ke memori lokal.");
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('recent-list');
+            const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            list.innerHTML = data.length ? "" : "<div style='color:#94a3b8; font-size:0.8rem;'>Belum ada riwayat.</div>";
+            data.forEach(item => {
+                list.innerHTML += `<div class="data-row"><span>${item.tgl}</span><span style="font-weight:700; color:var(--brand-red)">Rp ${item.amt.toLocaleString()}</span></div>`;
+            });
         }
 
         function renderBulanan() {
-            const container = document.getElementById('grid-bulanan');
+            const container = document.getElementById('rekap-container');
             const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
             const rekap = {};
             data.forEach(item => {
                 const m = new Date(item.tgl).toLocaleString('id-ID', { month: 'long', year: 'numeric' });
                 rekap[m] = (rekap[m] || 0) + item.amt;
             });
-            container.innerHTML = "";
+            container.innerHTML = "<label>Total Per Bulan</label>";
+            if(Object.keys(rekap).length === 0) container.innerHTML += "<div style='color:#94a3b8; font-size:0.8rem;'>Tidak ada data bulanan.</div>";
             for (const [bulan, total] of Object.entries(rekap)) {
-                container.innerHTML += `<div class="month-box"><div style="font-size:11px">${bulan}</div><div style="font-weight:700; color:var(--alfamidi-red)">Rp ${total.toLocaleString()}</div></div>`;
+                container.innerHTML += `<div class="nav-item"><span>${bulan}</span><span style="color:var(--brand-red)">Rp ${total.toLocaleString()}</span></div>`;
             }
         }
 
-        // PERBAIKAN FITUR EKSPOR
         function exportCSV() {
             const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-            if(data.length === 0) return alert("Tidak ada data");
-
-            let csvContent = "Tanggal,Jumlah\n";
-            data.forEach(item => { csvContent += `${item.tgl},${item.amt}\n`; });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
+            if(!data.length) return showModal("Gagal", "Tidak ada data yang tersedia untuk diekspor.");
+            let csv = "tanggal,minus\n";
+            data.forEach(i => csv += `${i.tgl},${i.amt}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", "laporan_kasir.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Laporan_Kasir.csv`;
+            a.click();
+            showModal("Ekspor Berhasil", "File laporan telah diunduh ke folder download.");
         }
 
         function salinFormatExcel() {
             const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-            if(data.length === 0) return alert("Data kosong");
-
-            let teks = "Tanggal\tJumlah\n"; // Menggunakan TAB agar rapi saat di-paste ke Excel/Sheets
-            data.forEach(item => { teks += `${item.tgl}\t${item.amt}\n`; });
-
-            navigator.clipboard.writeText(teks).then(() => {
-                alert("Teks berhasil disalin! Sekarang buka Google Sheets/Excel dan pilih 'Tempel' (Paste).");
-            });
+            if(!data.length) return showModal("Gagal", "Tidak ada data untuk disalin.");
+            let txt = "Tanggal\tNominal\n";
+            data.forEach(i => txt += `${i.tgl}\t${i.amt}\n`);
+            navigator.clipboard.writeText(txt).then(() => showModal("Berhasil Salin", "Data telah disalin ke clipboard. Silakan tempel di Excel."));
         }
 
-        function resetData() {
-            if(confirm("Hapus semua data?")) { localStorage.removeItem(DB_KEY); location.reload(); }
+        function triggerImport() { document.getElementById('file-input').click(); }
+
+        function importCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n').slice(1);
+                const newData = [];
+                rows.forEach(row => {
+                    const cols = row.split(',');
+                    if (cols.length === 2 && cols[0] !== "") {
+                        newData.push({ tgl: cols[0].trim(), amt: parseInt(cols[1].trim()) });
+                    }
+                });
+                if(newData.length > 0) {
+                    localStorage.setItem(DB_KEY, JSON.stringify(newData));
+                    renderHistory();
+                    showModal("Impor Berhasil", newData.length + " baris data telah berhasil diimpor.");
+                } else {
+                    showModal("Gagal", "Format file tidak sesuai atau data kosong.");
+                }
+            };
+            reader.readAsText(file);
         }
+
+        function confirmReset() {
+            if(confirm("Apakah Anda yakin ingin menghapus seluruh data?")) {
+                localStorage.removeItem(DB_KEY);
+                location.reload();
+            }
+        }
+
+        renderHistory();
     </script>
 </body>
 </html>
